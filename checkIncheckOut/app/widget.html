@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Check In/Out Tracker</title>
+    <script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=3.0&ak=Ij0yuOPvxLgyy2jN8Oiyovi4m1FHr038"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://live.zwidgets.com/js-sdk/1.0.5/ZohoEmbededAppSDK.min.js"></script>
+
+</head>
+
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="toggle-container">
+        <input type="checkbox" id="toggleSwitch" hidden>
+        <label for="toggleSwitch" class="toggle"></label>
+        <span id="toggleText">Check In</span>
+    </div>
+    <h2>Check In/Out Tracker</h2>
+    <p id="statusMessage" class="status-message">Fetching location, please wait...</p>
+
+    <table id="logTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Check-In Time</th>
+                <th>Location</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Check-Out Time</th>
+                <th>Location</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <!-- <th>Total Duration</th> -->
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr class="no-records">
+                <td colspan="11">No records found</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="script.js" type="text/javascript" defer></script>
+</body>
+
+</html>
