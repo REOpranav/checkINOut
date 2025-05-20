@@ -165,6 +165,29 @@ async function updateTable(current_User) {
                     `).join('') : `<tr class="no-records"><td colspan="11">No records found</td></tr>`;
 }
 
+// check in check out status
+async function CheckInOutStatus(CheckInStatus) {
+    let fetchedGeoCoding = await getAddress()
+
+    // Mathurantakam office location
+    const lat = 12.8876544;
+    const lng = 80.2390016;
+
+    // 20 square feet around
+    const latOffset = 0.0000868;
+    const lngOffset = 0.0000888;
+
+    const sw = new BMap.Point(lng - lngOffset, lat - latOffset);
+    const ne = new BMap.Point(lng + lngOffset, lat + latOffset);
+    const bounds = new BMap.Bounds(sw, ne);
+    const point = new BMap.Point(fetchedGeoCoding.lng, fetchedGeoCoding.lat); // current point
+
+    if (bounds.containsPoint(point)) { // check if your location is inside
+        CheckInStatus.innerText = "Office In"
+    } else {
+        CheckInStatus.innerText = "Remote In";
+    }
+}
 
 // Run the function after Page load
 ZOHO.embeddedApp.on("PageLoad", async function (data) {
@@ -184,6 +207,7 @@ ZOHO.embeddedApp.on("PageLoad", async function (data) {
     if (isCheckedIn) {
         toggleSwitch.checked = isCheckedIn;
         toggleText.innerText = 'Check Out';
+        CheckInOutStatus(CheckInStatus)
     }
 
     // main function of this context.
@@ -195,27 +219,7 @@ ZOHO.embeddedApp.on("PageLoad", async function (data) {
 
             if (isCheckedIn == false) {
                 await createRecord(fetchedGeoCoding, timeNow, current_User);
-
-                // mathurantakam office location
-                const lat = 12.8876544;
-                const lng = 80.2390016;
-
-                // 20 square feet around
-                const latOffset = 0.0000868; 
-                const lngOffset = 0.0000888;
-
-                const sw = new BMap.Point(lng - lngOffset, lat - latOffset);
-                const ne = new BMap.Point(lng + lngOffset, lat + latOffset);
-                const bounds = new BMap.Bounds(sw, ne);
-                const point = new BMap.Point(fetchedGeoCoding.lng, fetchedGeoCoding.lat); // current point
-
-                
-                if (bounds.containsPoint(point)) { // check if your location is inside
-                    CheckInStatus.innerText = "Office In"
-                } else {
-                    CheckInStatus.innerText = "Remote In";
-                }
-
+                await CheckInOutStatus(CheckInStatus)
                 toggleText.innerText = "Check Out";
             } else {
                 isCheckedIn = await updateRecord(fetchedGeoCoding, timeNow, current_User);

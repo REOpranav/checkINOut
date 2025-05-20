@@ -46,6 +46,10 @@
         gap: 10px;
     }
 
+    .CheckInStatus {
+        color: #0EBC6B;
+    }
+
     .toggle {
         position: relative;
         width: 50px;
@@ -68,7 +72,7 @@
     }
 
     input:checked+.toggle {
-        background: #4CAF50;
+        background: #0EBC6B;
     }
 
     input:checked+.toggle::before {
