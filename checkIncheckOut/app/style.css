@@ -50,7 +50,7 @@
         position: relative;
         width: 50px;
         height: 25px;
-        background: blue;
+        background: #ddd;
         border-radius: 20px;
         cursor: pointer;
     }

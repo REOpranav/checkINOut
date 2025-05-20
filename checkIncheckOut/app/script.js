@@ -61,6 +61,7 @@ function getAddress() {
     });
 }
 
+// create the new Check-In record 
 async function createRecord(fetchedGeoCoding, time) {
     let name, count, splittedValues;
     const today = new Date();
@@ -105,7 +106,7 @@ async function createRecord(fetchedGeoCoding, time) {
     }
 }
 
-
+// for updating the checkOut data
 async function updateRecord(fetchedGeoCoding, time, current_User) {
     let latestRecords = await getData();
 
@@ -164,28 +165,12 @@ async function updateTable(current_User) {
                     `).join('') : `<tr class="no-records"><td colspan="11">No records found</td></tr>`;
 }
 
-// main function of this context.
-async function toggleCheckInOut(isCheckedIn, current_User) {
-    showLoading()
-    let fetchedGeoCoding = await getAddress()
-    const timeNow = new Date().toLocaleString();
-    if (!isCheckedIn) {
-        await createRecord(fetchedGeoCoding, timeNow, current_User);
-        toggleText.innerText = "Check Out";
-    } else {
-        await updateRecord(fetchedGeoCoding, timeNow, current_User);
-        toggleText.innerText = "Check In";
-    }
-    isCheckedIn = !isCheckedIn;
-
-    await updateTable(current_User);
-    hideLoading();
-}
 
 // Run the function after Page load
 ZOHO.embeddedApp.on("PageLoad", async function (data) {
     let toggleSwitch = document.getElementById("toggleSwitch");
     let toggleText = document.getElementById("toggleText");
+    let CheckInStatus = document.getElementById("CheckInStatus")
     let progressBar = document.getElementById("progressBar");
     let statusMessage = document.getElementById("statusMessage");
 
@@ -195,14 +180,58 @@ ZOHO.embeddedApp.on("PageLoad", async function (data) {
     logData = logData.filter(item => item.Created_By.id === current_User.id);
 
     let isCheckedIn = logData.length > 0 ? logData[0].checkincheckoutbaidu__Status === 'Checked-In' : false;
-    console.log(isCheckedIn);
 
     if (isCheckedIn) {
         toggleSwitch.checked = isCheckedIn;
         toggleText.innerText = 'Check Out';
     }
 
-    document.querySelector('#toggleSwitch').addEventListener('change', () => toggleCheckInOut(isCheckedIn, current_User));
+    // main function of this context.
+    async function toggleCheckInOut() {
+        showLoading()
+        try {
+            let fetchedGeoCoding = await getAddress()
+            const timeNow = new Date().toLocaleString();
+
+            if (isCheckedIn == false) {
+                await createRecord(fetchedGeoCoding, timeNow, current_User);
+
+                // mathurantakam office location
+                const lat = 12.8876544;
+                const lng = 80.2390016;
+
+                // 20 square feet around
+                const latOffset = 0.0000868; 
+                const lngOffset = 0.0000888;
+
+                const sw = new BMap.Point(lng - lngOffset, lat - latOffset);
+                const ne = new BMap.Point(lng + lngOffset, lat + latOffset);
+                const bounds = new BMap.Bounds(sw, ne);
+                const point = new BMap.Point(fetchedGeoCoding.lng, fetchedGeoCoding.lat); // current point
+
+                
+                if (bounds.containsPoint(point)) { // check if your location is inside
+                    CheckInStatus.innerText = "Office In"
+                } else {
+                    CheckInStatus.innerText = "Remote In";
+                }
+
+                toggleText.innerText = "Check Out";
+            } else {
+                isCheckedIn = await updateRecord(fetchedGeoCoding, timeNow, current_User);
+                CheckInStatus.innerText = ''
+                toggleText.innerText = "Check In";
+            }
+            isCheckedIn = !isCheckedIn;
+        } catch (err) {
+            console.log(err.message)
+        }
+
+        await updateTable(current_User);
+        hideLoading();
+    }
+
+    document.querySelector('#toggleSwitch').addEventListener('change', () => toggleCheckInOut());
     await updateTable(current_User);
 })
 ZOHO.embeddedApp.init();
