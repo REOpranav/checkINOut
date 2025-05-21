@@ -62,7 +62,7 @@ function getAddress() {
 }
 
 // create the new Check-In record 
-async function createRecord(fetchedGeoCoding, time) {
+async function createRecord(fetchedGeoCoding, time,s,checkINOutStatus) {
     let name, count, splittedValues;
     const today = new Date();
     const formattedDate = today.toLocaleDateString('en-US'); // Adjust locale to match your needs
@@ -88,6 +88,7 @@ async function createRecord(fetchedGeoCoding, time) {
         "checkincheckoutbaidu__Check_out_Longitude": '-',
         "checkincheckoutbaidu__Check_out_Time": '-',
         "checkincheckoutbaidu__Status": "Checked-In",
+        "checkincheckoutbaidu__CheckIn_Type": `${checkINOutStatus}`,
         // "checkincheckoutbaidu__Duration": "-",
         "checkincheckoutbaidu__Check_Out_Location": '-'
     }
@@ -174,7 +175,7 @@ async function CheckInOutStatus(CheckInStatus) {
 
     // Calculate offsets for 50m x 50m box
     const latOffset = (25 / 111000); // ≈ 0.000225
-    const lngOffset = (25 / (111000 * Math.cos(lat * Math.PI / 180))); 
+    const lngOffset = (25 / (111000 * Math.cos(lat * Math.PI / 180)));
 
     const sw = new BMap.Point(lng - lngOffset, lat - latOffset);
     const ne = new BMap.Point(lng + lngOffset, lat + latOffset);
@@ -186,6 +187,8 @@ async function CheckInOutStatus(CheckInStatus) {
     } else {
         CheckInStatus.innerText = "Remote In";
     }
+    let CheckInOutStatus = CheckInStatus.innerText === "Office In" ? "Office In" : "Remote In";
+    return CheckInOutStatus;
 }
 
 // Run the function after Page load
@@ -217,8 +220,8 @@ ZOHO.embeddedApp.on("PageLoad", async function (data) {
             const timeNow = new Date().toLocaleString();
 
             if (isCheckedIn == false) {
-                await createRecord(fetchedGeoCoding, timeNow, current_User);
-                await CheckInOutStatus(CheckInStatus)
+                let checkINOutStatus = await CheckInOutStatus(CheckInStatus)
+                await createRecord(fetchedGeoCoding, timeNow, current_User, checkINOutStatus);
                 toggleText.innerText = "Check Out";
             } else {
                 isCheckedIn = await updateRecord(fetchedGeoCoding, timeNow, current_User);
