@@ -173,9 +173,9 @@ async function CheckInOutStatus(CheckInStatus) {
     const lat = 12.8876544;
     const lng = 80.2390016;
 
-    // 20 square feet around
-    const latOffset = 0.0000868;
-    const lngOffset = 0.0000888;
+    // 800 square feet around
+    const latOffset = 0.0000776;
+    const lngOffset = 0.0000791;
 
     const sw = new BMap.Point(lng - lngOffset, lat - latOffset);
     const ne = new BMap.Point(lng + lngOffset, lat + latOffset);
