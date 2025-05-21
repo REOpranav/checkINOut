@@ -169,13 +169,12 @@ async function updateTable(current_User) {
 async function CheckInOutStatus(CheckInStatus) {
     let fetchedGeoCoding = await getAddress()
 
-    // Mathurantakam office location
-    const lat = 12.8876544;
-    const lng = 80.2390016;
+    const lat = 12.500992;
+    const lng = 80.1538048;
 
-    // 800 square feet around
-    const latOffset = 0.0000776;
-    const lngOffset = 0.0000791;
+    // Calculate offsets for 50m x 50m box
+    const latOffset = (25 / 111000); // ≈ 0.000225
+    const lngOffset = (25 / (111000 * Math.cos(lat * Math.PI / 180))); 
 
     const sw = new BMap.Point(lng - lngOffset, lat - latOffset);
     const ne = new BMap.Point(lng + lngOffset, lat + latOffset);
